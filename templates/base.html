@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}COMPASS{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=9">
+  <link rel="icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0b731c">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</head>
+<body>
+  {% if user %}
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{{ url_for('about') }}">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="COMPASS">
+        <span class="sub">Academic Advising</span>
+      </a>
+      <nav class="nav">
+        {% set ep = request.endpoint %}
+        {% if user['role'] == 'advisor' %}
+          <a href="{{ url_for('advisor_students') }}" class="{{ 'active' if ep=='advisor_students' }}">My Students</a>
+          <a href="{{ url_for('advisor_approvals') }}" class="{{ 'active' if ep=='advisor_approvals' }}">Approvals</a>
+          <a href="{{ url_for('advisor_requests') }}" class="{{ 'active' if ep=='advisor_requests' }}">Requests</a>
+          <a href="{{ url_for('advisor_stats') }}" class="{{ 'active' if ep in ['advisor_stats','advisor_stats_course'] }}">Statistics</a>
+        {% elif user['role'] == 'admin' %}
+          <a href="{{ url_for('admin_home') }}" class="{{ 'active' if ep=='admin_home' }}">Dashboard</a>
+          <a href="{{ url_for('admin_graduates') }}" class="{{ 'active' if ep=='admin_graduates' }}">Graduates</a>
+          <a href="{{ url_for('admin_teams') }}" class="{{ 'active' if ep=='admin_teams' }}">Teams</a>
+          <a href="{{ url_for('admin_courses') }}" class="{{ 'active' if ep=='admin_courses' }}">Courses</a>
+          <a href="{{ url_for('admin_semesters') }}" class="{{ 'active' if ep=='admin_semesters' }}">Semesters</a>
+          <a href="{{ url_for('admin_users') }}" class="{{ 'active' if ep=='admin_users' }}">Users</a>
+        {% endif %}
+        <span class="who">{{ user['name'] }}</span>
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+  {% endif %}
+
+  {% if user and user['role'] == 'student' %}
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="sidebar-title">My Tasks</div>
+      {% for sec in student_tasks %}
+        {% set sec_open = active_task in (sec['items'] | map(attribute='key') | list) %}
+        <div class="side-group {{ 'open' if sec_open }}">
+          <button type="button" class="side-section" onclick="this.parentElement.classList.toggle('open')">
+            <span>{{ sec['section'] }}</span><span class="chev">›</span>
+          </button>
+          <div class="side-items">
+            {% for it in sec['items'] %}
+              {% set href = url_for(it['endpoint']) if it['endpoint'] else url_for('student_task', key=it['key']) %}
+              <a class="side-link {{ 'active' if active_task == it['key'] }}" href="{{ href }}">
+                <span class="lbl">{{ it['label'] }}</span>
+                {% if it['status'] == 'soon' %}<span class="soon-dot">Soon</span>{% endif %}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </aside>
+    <main class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}<div class="flash {{ category }}">{{ msg }}</div>{% endfor %}
+      {% endwith %}
+      {% block student_content %}{% endblock %}
+    </main>
+  </div>
+  {% else %}
+  <main class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}<div class="flash {{ category }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  {% endif %}
+
+  {% if user %}
+  <button class="bot-fab" id="botFab" aria-label="Ask COMPASS-Bot" title="Ask COMPASS-Bot"><img src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot"></button>
+  <div class="bot-panel" id="botPanel" hidden>
+    <div class="bot-head">
+      <img class="bot-face" src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot">
+      <div><b>COMPASS-Bot</b><span class="sub">Answers from the CS study plan only</span></div>
+    </div>
+    <div class="bot-msgs" id="botMsgs">
+      <div class="bot-msg bot">Hi! Ask me about the CS plan — a course (e.g. CPCS-204), a level (e.g. level 7), or a block — or how a task works (e.g. "what do I need for summer training?").</div>
+    </div>
+    <div class="bot-input">
+      <input id="botInput" type="text" placeholder="Ask about the CS plan…" autocomplete="off">
+      <button class="btn sm" id="botSend" type="button">Send</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      var fab=document.getElementById('botFab'), panel=document.getElementById('botPanel');
+      var msgs=document.getElementById('botMsgs'), input=document.getElementById('botInput'), send=document.getElementById('botSend');
+      if(!fab) return;
+      function add(text, who){var d=document.createElement('div');d.className='bot-msg '+who;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d;}
+      fab.addEventListener('click',function(){
+        if(panel.hasAttribute('hidden')){panel.removeAttribute('hidden');input.focus();}
+        else{panel.setAttribute('hidden','');}
+      });
+      function ask(){
+        var q=input.value.trim(); if(!q) return;
+        add(q,'me'); input.value='';
+        var typing=add('…','bot');
+        fetch('/bot/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})})
+          .then(function(r){return r.json();})
+          .then(function(d){typing.textContent=d.answer||'—';})
+          .catch(function(){typing.textContent='Sorry, something went wrong.';});
+      }
+      send.addEventListener('click',ask);
+      input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();ask();}});
+    })();
+  </script>
+  {% endif %}
+</body>
+</html>

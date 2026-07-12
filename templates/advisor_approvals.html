@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Approvals — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Course preference approvals</h1>
+<p class="page-sub">Review each preference and approve or reject it — no student is registered without your approval</p>
+
+{% if pending %}
+<div class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Student</th><th>ID</th><th>Level</th><th>Course</th><th>Type</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      {% for w in pending %}
+      <tr>
+        <td>{{ w['student'] }}</td>
+        <td>{{ w['university_id'] }}</td>
+        <td>{{ w['level'] }}</td>
+        <td><strong>{{ w['code'] }}</strong> — {{ w['course'] }}</td>
+        <td><span class="badge {{ w['type'] }}">{{ TYPE_AR[w['type']] }}</span></td>
+        <td>
+          <form method="post" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
+            <input type="hidden" name="wish_id" value="{{ w['id'] }}">
+            <input type="text" name="note" placeholder="Note (optional)" style="width:150px">
+            <button class="btn sm" name="action" value="approved">Approve</button>
+            <button class="btn sm danger" name="action" value="rejected">Reject</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card center mini">No preferences awaiting approval. All caught up! </div>
+{% endif %}
+{% endblock %}

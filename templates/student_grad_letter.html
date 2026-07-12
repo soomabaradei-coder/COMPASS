@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Plan Conformity Statement — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Plan Conformity Statement</h1>
+<p class="page-sub">Issued after the system verifies requirements and the advisor approves</p>
+
+{% if approved %}
+<div class="card letter" style="max-width:800px; margin:0 auto">
+  <div class="center" style="border-bottom:2px solid var(--accent); padding-bottom:14px; margin-bottom:22px">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="COMPASS" style="height:30px">
+    <div class="mini">Faculty of Computing &amp; Information Technology — King Abdulaziz University</div>
+    <div class="mini">Computer Science Department</div>
+  </div>
+
+  <h2 class="center" style="margin:0 0 22px">Plan Conformity Statement</h2>
+
+  <table style="margin-bottom:22px">
+    <tr><th style="width:35%">Student name</th><td>{{ user['name'] }}</td></tr>
+    <tr><th>University ID</th><td>{{ st['university_id'] }}</td></tr>
+    <tr><th>Graduation semester</th><td>{{ approved['grad_semester'] or '—' }}</td></tr>
+    <tr><th>Track</th><td>{{ st['track'] or 'Undeclared' }}</td></tr>
+    <tr><th>Notes</th><td>{{ approved['advisor_note'] or '' }}</td></tr>
+  </table>
+
+  <p style="line-height:2.3; font-size:15px">
+    This is to certify that the student named above will have completed, by the end of this semester,
+    all required graduation hours: ({{ reqs['core_credits'] }}) core credits,
+    ({{ reqs['elective_courses'] }}) elective courses,
+    and ({{ reqs['free_credits'] }}) free credits — for a total of {{ total }} hours.
+  </p>
+
+  <div style="margin-top:36px">
+    <div class="center" style="font-weight:700; margin-bottom:10px">Academic Advisor</div>
+    <table style="max-width:360px; margin:0 auto">
+      <tr><th style="width:35%">Name</th><td>{{ advisor['name'] if advisor }}</td></tr>
+      <tr><th>Signature</th><td style="height:40px"></td></tr>
+      <tr><th>Date</th><td>{{ approved['created_at'] }}</td></tr>
+    </table>
+  </div>
+
+  <div class="center no-print" style="margin-top:26px">
+    <button class="btn" onclick="window.print()">Print statement</button>
+  </div>
+</div>
+{% elif req and req['status'] == 'pending' %}
+<div class="card center">
+  <h3 style="margin:10px 0 6px">Your request is under review</h3>
+  <p class="mini">You submitted a graduation confirmation request; it's awaiting advisor approval.</p>
+</div>
+{% else %}
+<div class="card center">
+  <h3 style="margin:10px 0 6px">Statement not issued yet</h3>
+  <p class="mini">To get the statement, first submit a graduation confirmation request from the
+    <a href="{{ url_for('student_graduation') }}">Graduation Requirements</a> page and have it approved.</p>
+</div>
+{% endif %}
+{% endblock %}

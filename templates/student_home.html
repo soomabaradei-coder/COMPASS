@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Home — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Welcome, {{ user['name'] }}</h1>
+<p class="page-sub">Student dashboard — track your academic path to graduation</p>
+
+<div class="grid cols-4">
+  <div class="card stat"><div class="num">{{ st['level'] }}</div><div class="lbl">Level</div></div>
+  <div class="card stat"><div class="num">{{ st['university_id'] }}</div><div class="lbl">University ID</div></div>
+  <div class="card stat"><div class="num" style="font-size:16px">{{ st['track'] or 'Undeclared' }}</div><div class="lbl">Track</div></div>
+  <div class="card stat"><div class="num" style="font-size:16px">{{ advisor['name'] if advisor }}</div><div class="lbl">Advisor</div></div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Course preferences — {{ sem['name'] if sem else 'No active semester' }}</h3>
+  {% if wishes %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Code</th><th>Course</th><th>Credits</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for w in wishes %}
+        <tr>
+          <td>{{ w['code'] }}</td><td>{{ w['name'] }}</td><td>{{ w['credits'] }}</td>
+          <td><span class="badge {{ w['type'] }}">{{ TYPE_AR[w['type']] }}</span></td>
+          <td><span class="badge {{ w['status'] }}">{{ STATUS_AR[w['status']] }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="mini" style="margin-top:12px">Note: no preference is registered until approved by your academic advisor.</p>
+  {% else %}
+  <p class="mini">You haven't selected any preferences yet. <a href="{{ url_for('student_wishes') }}">Choose your courses →</a></p>
+  {% endif %}
+</div>
+{% endblock %}

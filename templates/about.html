@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>COMPASS — Computer Science Academic Support System</title>
+  <style>
+    :root{
+      --ink:#0e1512; --muted:#5c6b62; --faint:#8a978e;
+      --line:#e7ece8; --bg:#ffffff; --panel:#f7faf8;
+      --accent:#0b731c; --accent-soft:#eaf6ec;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:"Inter","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+      color:var(--ink);background:var(--bg);line-height:1.65;
+      -webkit-font-smoothing:antialiased;
+    }
+    .mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono","Menlo",monospace;}
+    .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+    a{color:inherit;text-decoration:none}
+
+    /* Top bar */
+    .nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);z-index:10}
+    .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
+    .brand img{height:20px}
+    .nav a.cta{font-size:13px;font-weight:600;border:1px solid var(--ink);border-radius:8px;padding:8px 16px;transition:.15s}
+    .nav a.cta:hover{background:var(--ink);color:#fff}
+
+    /* eyebrow labels */
+    .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600}
+    .idx{color:var(--faint)}
+
+    /* Hero */
+    .hero{padding:96px 0 72px;border-bottom:1px solid var(--line);
+      background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px;background-position:center}
+    .hero-inner{max-width:720px}
+    .hero h1{font-size:64px;line-height:1;letter-spacing:-2px;font-weight:800;margin:18px 0 10px}
+    .hero .sub{font-size:19px;color:var(--muted);font-weight:500}
+    .hero p{margin-top:22px;font-size:17px;color:var(--muted);max-width:600px}
+    .btn{display:inline-block;margin-top:30px;background:var(--accent);color:#fff;font-weight:600;
+      font-size:14px;padding:12px 26px;border-radius:9px;transition:.15s}
+    .btn:hover{background:#095c16}
+    .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);margin-inline-start:10px}
+    .btn.ghost:hover{border-color:var(--ink)}
+
+    /* Sections */
+    section{padding:72px 0;border-bottom:1px solid var(--line)}
+    .section-head{margin-bottom:40px}
+    .section-head h2{font-size:30px;letter-spacing:-.5px;font-weight:700;margin-top:10px}
+    .lead{font-size:18px;color:var(--muted);max-width:640px}
+
+    /* Two-column list */
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px 48px}
+    .row{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+    .row .n{color:var(--faint);font-size:13px;min-width:26px}
+    .row b{font-weight:600}
+    .row span{color:var(--muted)}
+
+    /* Services grid */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+      border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .cell{background:var(--bg);padding:26px 22px;min-height:150px}
+    .cell:hover{background:var(--panel)}
+    .cell .k{font-size:12px;color:var(--faint)}
+    .cell h3{font-size:16px;font-weight:650;margin:14px 0 8px;letter-spacing:-.2px}
+    .cell p{font-size:14px;color:var(--muted)}
+    .cell .soon{display:inline-block;margin-top:10px;font-size:11px;color:var(--accent);
+      background:var(--accent-soft);padding:2px 9px;border-radius:99px;font-weight:600}
+
+    /* Impact strip */
+    .impact{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+    .impact .item h4{font-size:15px;font-weight:700;margin-bottom:6px}
+    .impact .item p{font-size:13.5px;color:var(--muted)}
+
+    footer{padding:40px 0;color:var(--faint);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+    @media(max-width:760px){
+      .hero{padding:64px 0 52px}
+      .hero h1{font-size:44px;letter-spacing:-1px}
+      .cols{grid-template-columns:1fr;gap:0}
+      .grid{grid-template-columns:1fr}
+      .impact{grid-template-columns:1fr 1fr;gap:24px}
+    }
+  </style>
+  <link rel="icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0b731c">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap">
+      <a class="brand" href="#top"><img src="{{ url_for('static', filename='logo.png') }}" alt="COMPASS">COMPASS</a>
+      {% if user %}<a class="cta" href="{{ url_for('index') }}">Open the app →</a>
+      {% else %}<a class="cta" href="{{ url_for('login') }}">Sign in →</a>{% endif %}
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="wrap hero-inner">
+      <div class="eyebrow mono">Faculty of Computing &amp; IT · King Abdulaziz University</div>
+      <h1>COMPASS</h1>
+      <div class="sub">Computer Science Academic Support System</div>
+      <p>A unified, data-driven platform that modernizes academic advising — guiding every student
+         from enrollment to graduation, and connecting students, advisors, and coordinators in one place.</p>
+      {% if user %}<a class="btn" href="{{ url_for('index') }}">Open the app</a>
+      {% else %}<a class="btn" href="{{ url_for('login') }}">Sign in</a>{% endif %}
+      <a class="btn ghost" href="#services">Explore the platform</a>
+    </div>
+  </header>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow mono"><span class="idx">01</span> &nbsp;Overview</div>
+      <div class="section-head"><h2>Advising, rebuilt as software.</h2></div>
+      <p class="lead">COMPASS replaces manual, paper-based advising with a single digital system built for
+        transparency, efficiency, and academic quality — aligned with Saudi Vision 2030 and ABET accreditation standards.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow mono"><span class="idx">02</span> &nbsp;Objectives</div>
+      <div class="section-head"><h2>What the platform is built to do.</h2></div>
+      <div class="cols">
+        <div class="row"><span class="n mono">01</span><div><b>Streamline workflows.</b> <span>Simplify advising and approval processes end to end.</span></div></div>
+        <div class="row"><span class="n mono">02</span><div><b>Go paperless.</b> <span>Eliminate paper forms and manual correspondence.</span></div></div>
+        <div class="row"><span class="n mono">03</span><div><b>Automate compliance.</b> <span>Validate data and enforce ABET accreditation standards.</span></div></div>
+        <div class="row"><span class="n mono">04</span><div><b>Empower with data.</b> <span>Give advisors and students real-time academic insight.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="eyebrow mono"><span class="idx">03</span> &nbsp;Platform</div>
+      <div class="section-head"><h2>One system, every step of the journey.</h2></div>
+      <div class="grid">
+        <div class="cell"><div class="k mono">01</div><h3>Course Preferences &amp; Blocks</h3><p>Collect course preferences and validate ready-made schedule blocks.</p></div>
+        <div class="cell"><div class="k mono">02</div><h3>Academic Profile</h3><p>Maintain a unified record of academic, track, and training data.</p></div>
+        <div class="cell"><div class="k mono">03</div><h3>Track Certificates</h3><p>Verify track-certificate eligibility against the approved plan.</p></div>
+        <div class="cell"><div class="k mono">04</div><h3>Graduation Project</h3><p>Check CPCS-498 registration eligibility and monitor progress.</p></div>
+        <div class="cell"><div class="k mono">05</div><h3>Forms &amp; Approvals</h3><p>Digitize academic forms and process approvals without paper.</p></div>
+        <div class="cell"><div class="k mono">06</div><h3>Graduation Confirmation</h3><p>Auto-verify requirements and issue the plan-conformity statement.</p></div>
+        <div class="cell"><div class="k mono">07</div><h3>Analytics</h3><p>Turn advising data into clickable, decision-ready insights.</p></div>
+        <div class="cell"><div class="k mono">08</div><h3>Advisor Approval</h3><p>Route every request through academic-advisor approval.</p></div>
+        <div class="cell"><div class="k mono">09</div><h3>COMPASS-Bot</h3><p>Deliver instant academic guidance with an AI assistant.</p><span class="soon">Coming soon</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow mono"><span class="idx">04</span> &nbsp;Impact</div>
+      <div class="section-head"><h2>Why it matters.</h2></div>
+      <div class="impact">
+        <div class="item"><h4>Efficiency</h4><p>Less advising time and administrative load through automation.</p></div>
+        <div class="item"><h4>Accuracy</h4><p>Compliance with academic regulations and ABET standards.</p></div>
+        <div class="item"><h4>Readiness</h4><p>Real-time visibility into each student's path to graduation.</p></div>
+        <div class="item"><h4>Alignment</h4><p>Advancing digital transformation under Vision 2030.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="eyebrow mono"><span class="idx">05</span> &nbsp;Strategic Alignment</div>
+      <div class="section-head"><h2>Built for the Kingdom's future.</h2></div>
+      <div class="impact" style="grid-template-columns:repeat(3,1fr)">
+        <div class="item">
+          <h4>Saudi Vision 2030</h4>
+          <p>COMPASS advances Vision 2030's goal of a smart, technology-driven education sector
+             and a knowledge-based economy — modernizing how the department serves its students.</p>
+        </div>
+        <div class="item">
+          <h4>Digital Transformation</h4>
+          <p>It replaces paper forms and manual advising with one unified, data-driven platform,
+             reflecting the department's commitment to full digital transformation.</p>
+        </div>
+        <div class="item">
+          <h4>The Year of AI</h4>
+          <p>In line with the Kingdom's focus on Artificial Intelligence, COMPASS embeds an AI
+             assistant — COMPASS-Bot — to guide every student through their academic journey.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <footer>
+      <span>COMPASS · Computer Science Department, King Abdulaziz University</span>
+      {% if user %}<a class="mono" href="{{ url_for('index') }}">Open the app →</a>
+      {% else %}<a class="mono" href="{{ url_for('login') }}">Sign in →</a>{% endif %}
+    </footer>
+  </div>
+</body>
+</html>

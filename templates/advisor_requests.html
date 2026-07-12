@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Requests — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Student requests</h1>
+<p class="page-sub">Graduation project, track certificates, blocks, waivers &amp; more — each needs your approval</p>
+
+{% if reqs %}
+<div class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Student</th><th>Level</th><th>Request</th><th>Details</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      {% for r in reqs %}
+      <tr>
+        <td>{{ r['student'] }}<br><span class="mini">{{ r['university_id'] }}</span></td>
+        <td>{{ r['level'] }}</td>
+        <td>
+          {{ r['title'] }}
+          {% if r['eligible'] is not none %}
+            <br>{% if r['eligible'] %}<span class="badge approved">Met</span>
+                {% else %}<span class="badge pending">Not met</span>{% endif %}
+          {% endif %}
+        </td>
+        <td class="mini">{{ r['details'] }}</td>
+        <td><span class="badge {{ r['status'] }}">{{ STATUS_AR[r['status']] }}</span></td>
+        <td>
+          {% if r['status'] == 'pending' %}
+          <form method="post" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap">
+            <input type="hidden" name="request_id" value="{{ r['id'] }}">
+            <input type="text" name="note" placeholder="Note" style="width:120px">
+            <button class="btn sm" name="action" value="approved">Approve</button>
+            <button class="btn sm danger" name="action" value="rejected">Reject</button>
+          </form>
+          {% else %}
+            <span class="mini">{{ r['advisor_note'] or '—' }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card center mini">No requests yet.</div>
+{% endif %}
+{% endblock %}

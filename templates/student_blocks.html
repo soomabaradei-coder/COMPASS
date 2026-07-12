@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Choose Block — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Choose your schedule block</h1>
+<p class="page-sub">Pick the ready-made block for your level — each block is a conflict-free set of courses</p>
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last chosen block</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <form method="get" class="row-inline">
+    <div>
+      <label>Level group</label>
+      <select name="group" onchange="this.form.submit()">
+        {% for g in groups %}
+        <option value="{{ g }}" {{ 'selected' if g==group }}>{{ g }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:0 0 auto"><button class="btn ghost" type="submit">Show</button></div>
+  </form>
+</div>
+
+<form method="post">
+  <input type="hidden" name="group" value="{{ group }}">
+  <div class="grid cols-2">
+    {% for b in blocks %}
+    <label class="card" style="cursor:pointer; display:block">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+        <input type="radio" name="block" value="{{ b['name'] }}" style="width:auto" required>
+        <strong>{{ b['name'] }}</strong>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px">
+        {% for c in b['courses'] %}<span class="badge core">{{ c }}</span>{% endfor %}
+      </div>
+    </label>
+    {% endfor %}
+  </div>
+  {% if blocks %}
+  <button class="btn" type="submit" style="margin-top:6px">Send for approval</button>
+  {% else %}
+  <div class="card center mini">No blocks for this group.</div>
+  {% endif %}
+</form>
+{% endblock %}

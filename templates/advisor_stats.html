@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Statistics — COMPASS{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px">
+  <div>
+    <h1 class="page-title">Course statistics</h1>
+    <p class="page-sub">Number of students interested in each course and their distribution by level — active semester</p>
+  </div>
+  <a class="btn ghost" href="{{ url_for('advisor_stats_export') }}">Export Excel</a>
+</div>
+
+{% if stats %}
+<div class="card table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Course</th><th>Type</th><th>Total interested</th><th>Approved</th>
+        {% for l in levels %}<th>Level {{ l }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in stats %}
+      <tr>
+        <td><strong>{{ s['code'] }}</strong> — {{ s['name'] }}</td>
+        <td><span class="badge {{ s['type'] }}">{{ TYPE_AR[s['type']] }}</span></td>
+        <td>
+          <a href="{{ url_for('advisor_stats_course', course_id=s['id']) }}"
+             style="font-weight:800; font-size:16px">{{ s['total'] }}</a>
+        </td>
+        <td><span class="badge approved">{{ s['approved'] }}</span></td>
+        {% for l in levels %}
+          <td>{{ s['by_level'].get(l, '') }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="mini">Click a "Total interested" number to see the student names for each course.</p>
+{% else %}
+<div class="card center mini">No preferences recorded for the active semester yet.</div>
+{% endif %}
+{% endblock %}

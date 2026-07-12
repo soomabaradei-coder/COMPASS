@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Courses — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Manage courses</h1>
+<p class="page-sub">Add and classify study courses</p>
+
+<div class="card">
+  <h3 style="margin-top:0">Add a course</h3>
+  <form method="post">
+    <input type="hidden" name="action" value="add">
+    <div class="row-inline">
+      <div><label>Code</label><input name="code" required placeholder="CPCS-204"></div>
+      <div><label>Name</label><input name="name" required placeholder="Data Structures (I)"></div>
+      <div><label>Type</label>
+        <select name="type"><option value="core">Core</option><option value="elective">Elective</option><option value="free">Free</option></select>
+      </div>
+      <div><label>Credits</label><input name="credits" type="number" value="3" min="0" max="6" required></div>
+      <div><label>Offered</label>
+        <select name="parity"><option value="both">Both</option><option value="odd">Odd</option><option value="even">Even</option></select>
+      </div>
+      <div><label>Suggested level</label><input name="level" type="number" min="1" max="10" placeholder="5"></div>
+      <div><label>Prerequisite</label><input name="prereq" placeholder="CPCS-204, CPCS-222"></div>
+      <div style="flex:0 0 auto"><button class="btn" type="submit">Add</button></div>
+    </div>
+  </form>
+</div>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Code</th><th>Name</th><th>Type</th><th>Credits</th><th>Offered</th><th>Level</th><th>Prerequisite</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for c in courses %}
+      <tr class="{{ '' if c['is_active'] else 'locked' }}">
+        <td><strong>{{ c['code'] }}</strong></td>
+        <td>{{ c['name'] }}</td>
+        <td><span class="badge {{ c['type'] }}">{{ TYPE_AR[c['type']] }}</span></td>
+        <td>{{ c['credits'] }}</td>
+        <td>{{ PARITY_AR[c['parity']] }}</td>
+        <td>{{ c['recommended_level'] or '—' }}</td>
+        <td class="mini">{{ c['prereq'] or '—' }}</td>
+        <td>{{ 'Active' if c['is_active'] else 'Disabled' }}</td>
+        <td>
+          <form method="post" style="margin:0">
+            <input type="hidden" name="action" value="toggle">
+            <input type="hidden" name="id" value="{{ c['id'] }}">
+            <button class="btn sm gray" type="submit">{{ 'Disable' if c['is_active'] else 'Enable' }}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Graduation Project — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Graduation Project eligibility (CPCS-498)</h1>
+<p class="page-sub">You're eligible to register for Senior Project (I) once you've passed the courses below</p>
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last submitted request</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  <p class="mini">Initial check:
+    {% if existing['eligible'] %}<span class="badge approved">Requirements met</span>
+    {% else %}<span class="badge pending">Some requirements missing</span>{% endif %}
+  </p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<form method="post">
+  <div class="card">
+    <h3 style="margin-top:0">Select the courses you've passed</h3>
+    <div class="pick">
+      {% for code, name in prereqs %}
+      <label class="pick-item">
+        <input type="checkbox" name="passed" value="{{ code }}">
+        <span class="grow"><strong>{{ code }}</strong> — {{ name }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <div style="margin-top:16px; display:flex; gap:10px; align-items:center">
+      <button class="btn" type="submit">Send for approval</button>
+      <span class="mini">The request is sent to your advisor for verification and final approval.</span>
+    </div>
+  </div>
+</form>
+{% endblock %}

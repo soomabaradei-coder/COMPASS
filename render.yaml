@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: compass
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      # For durable data, add a persistent disk and set DB_PATH to a path on it, e.g.:
+      # - key: DB_PATH
+      #   value: /var/data/compass.db
+    # disk:
+    #   name: compass-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

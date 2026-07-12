@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Senior Project Teams — COMPASS{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px">
+  <div>
+    <h1 class="page-title">Senior Project Teams</h1>
+    <p class="page-sub">Submitted graduation-project teams, supervisors, and approval status</p>
+  </div>
+  <a class="btn ghost" href="{{ url_for('admin_teams_export') }}">Export Excel</a>
+</div>
+
+{% if rows %}
+<div class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Submitted by</th><th>Members</th><th>Supervisor email</th>
+          <th>Supervisor approved</th><th>Advisor approval</th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r['student'] }}<br><span class="mini">{{ r['university_id'] }}</span></td>
+        <td class="mini">
+          {{ r['m1_name'] }} ({{ r['m1_id'] }});
+          {{ r['m2_name'] }} ({{ r['m2_id'] }}){% if r['m3_name'] %}; {{ r['m3_name'] }} ({{ r['m3_id'] }}){% endif %}
+        </td>
+        <td class="mini">{{ r['supervisor_email'] }}</td>
+        <td>{% if r['supervisor_approved'] %}<span class="badge approved">Yes</span>
+            {% else %}<span class="badge pending">Pending</span>{% endif %}</td>
+        <td><span class="badge {{ r['req_status'] }}">{{ STATUS_AR[r['req_status']] if r['req_status'] else '—' }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card center mini">No teams submitted yet.</div>
+{% endif %}
+{% endblock %}

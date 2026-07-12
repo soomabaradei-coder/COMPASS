@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Graduates — COMPASS{% endblock %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px">
+  <div>
+    <h1 class="page-title">Graduates dashboard</h1>
+    <p class="page-sub">Every student who submitted a graduation request — approval, track, and eligibility</p>
+  </div>
+  <a class="btn ghost" href="{{ url_for('admin_graduates_export') }}">Export Excel</a>
+</div>
+
+<div class="grid cols-4">
+  <div class="card stat"><div class="num">{{ summary['total'] }}</div><div class="lbl">Total graduates</div></div>
+  <div class="card stat"><div class="num">{{ summary['approved'] }}</div><div class="lbl">Advisor-approved</div></div>
+  <div class="card stat"><div class="num">{{ summary['pending'] }}</div><div class="lbl">Awaiting approval</div></div>
+  <div class="card stat"><div class="num">{{ summary['eligible'] }}</div><div class="lbl">Requirements met</div></div>
+</div>
+
+{% if rows %}
+<div class="card table-wrap">
+  <table>
+    <thead>
+      <tr><th>Student</th><th>University ID</th><th>Level</th><th>Track</th>
+          <th>Advisor</th><th>Grad. semester</th><th>Requirements</th><th>Advisor approval</th></tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r['student'] }}</td>
+        <td>{{ r['university_id'] }}</td>
+        <td>{{ r['level'] }}</td>
+        <td>{{ r['track'] or 'Undeclared' }}</td>
+        <td>{{ r['advisor'] or '—' }}</td>
+        <td>{{ r['grad_semester'] or '—' }}</td>
+        <td>{% if r['eligible'] %}<span class="badge approved">Met</span>
+            {% else %}<span class="badge pending">Not met</span>{% endif %}</td>
+        <td><span class="badge {{ r['status'] }}">{{ STATUS_AR[r['status']] }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card center mini">No graduation requests yet.</div>
+{% endif %}
+{% endblock %}

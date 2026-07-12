@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}My Students — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">My students</h1>
+<p class="page-sub">Students under your academic supervision</p>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>University ID</th><th>Level</th><th>Track</th><th>Pending preferences</th></tr></thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td>{{ s['name'] }}</td>
+        <td>{{ s['university_id'] }}</td>
+        <td>{{ s['level'] }}</td>
+        <td>{{ s['track'] or 'Undeclared' }}</td>
+        <td>
+          {% if s['pending'] %}
+            <a href="{{ url_for('advisor_approvals') }}"><span class="badge pending">{{ s['pending'] }} pending</span></a>
+          {% else %}
+            <span class="mini">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      {% if not students %}<tr><td colspan="5" class="center mini">No students assigned to you.</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Users — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Users</h1>
+<p class="page-sub">All platform accounts and academic-supervision assignment</p>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>University ID</th><th>Level</th><th>Track</th><th>Advisor</th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u['name'] }}</td>
+        <td class="mini">{{ u['email'] }}</td>
+        <td>
+          {% if u['role']=='admin' %}<span class="badge free">Admin</span>
+          {% elif u['role']=='advisor' %}<span class="badge elective">Advisor</span>
+          {% else %}<span class="badge core">Student</span>{% endif %}
+        </td>
+        <td>{{ u['university_id'] or '—' }}</td>
+        <td>{{ u['level'] or '—' }}</td>
+        <td>{{ u['track'] or '—' }}</td>
+        <td>{{ u['advisor'] or '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

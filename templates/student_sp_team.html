@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Senior Project Team — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Senior Project Team</h1>
+<p class="page-sub">Form a group of 3 students for the graduation project (third member optional)</p>
+
+{% if sp and sp['status'] == 'approved' %}
+  <div class="flash success">Your Graduation Project (CPCS-498) eligibility is approved — you can form your team.</div>
+{% elif sp and sp['status'] == 'pending' %}
+  <div class="flash">Note: your Graduation Project eligibility is still pending approval.</div>
+{% else %}
+  <div class="flash">Note: submit and get your <a href="{{ url_for('student_senior_project') }}">Graduation Project eligibility</a> approved first.</div>
+{% endif %}
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last submitted team</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<form method="post">
+  <div class="card">
+    <h3 style="margin-top:0">Member 1 (you)</h3>
+    <div class="row-inline">
+      <div><label>Full name</label><input name="m1_name" value="{{ user['name'] }}" required></div>
+      <div><label>KAU ID</label><input name="m1_id" value="{{ st['university_id'] }}" required></div>
+      <div><label>Email</label><input name="m1_email" type="email" value="{{ user['email'] }}"></div>
+    </div>
+    <div class="field" style="max-width:260px; margin-top:12px">
+      <label>Phone number</label><input name="phone" placeholder="05xxxxxxxx">
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Member 2</h3>
+    <div class="row-inline">
+      <div><label>Full name</label><input name="m2_name" required placeholder="Full name"></div>
+      <div><label>KAU ID</label><input name="m2_id" required placeholder="21xxxxx"></div>
+      <div><label>Email</label><input name="m2_email" type="email" placeholder="name@kau.edu.sa"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Member 3 <span class="mini">(optional)</span></h3>
+    <div class="row-inline">
+      <div><label>Full name</label><input name="m3_name" placeholder="Full name"></div>
+      <div><label>KAU ID</label><input name="m3_id" placeholder="21xxxxx"></div>
+      <div><label>Email</label><input name="m3_email" type="email" placeholder="name@kau.edu.sa"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Project supervisor</h3>
+    <div class="field">
+      <label>Supervisor email *</label>
+      <input name="supervisor_email" type="email" required placeholder="supervisor@kau.edu.sa">
+      <p class="mini" style="margin:6px 0 0">Enter the project supervisor's email so the supervision request can be sent for her approval.</p>
+    </div>
+    <label style="display:flex; align-items:center; gap:8px; margin-bottom:14px">
+      <input type="checkbox" name="supervisor_approved" value="1" style="width:auto">
+      <span>We confirm we contacted the supervisor and received her approval to supervise</span>
+    </label>
+    <div class="field">
+      <label>Comments (optional)</label>
+      <textarea name="comments" rows="2" placeholder="Anything the advisor should know…"></textarea>
+    </div>
+    <p class="mini">Your academic advisor ({{ advisor['name'] if advisor else '—' }}) is known and will review this request.</p>
+    <button class="btn" type="submit">Submit team for approval</button>
+  </div>
+</form>
+{% endblock %}

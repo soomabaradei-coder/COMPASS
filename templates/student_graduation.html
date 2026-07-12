@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Graduation Requirements — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Graduation requirements status</h1>
+<p class="page-sub">Your completed record compared with the approved graduation requirements</p>
+
+<div class="eligible-banner {{ 'yes' if report['eligible'] else 'no' }}">
+  {% if report['eligible'] %}All graduation requirements met{% else %}Some requirements are still incomplete{% endif %}
+</div>
+
+<div class="grid cols-3">
+  {% for it in report['items'] %}
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center">
+      <strong>{{ it['label'] }}</strong>
+      <span class="badge {{ 'approved' if it['met'] else 'pending' }}">{{ 'Complete' if it['met'] else 'Incomplete' }}</span>
+    </div>
+    <div style="font-size:26px; font-weight:800; color:var(--accent); margin:8px 0">
+      {{ it['have'] }} <span style="font-size:15px; color:var(--muted)">/ {{ it['need'] }} {{ it['unit'] }}</span>
+    </div>
+    <div class="bar {{ 'met' if it['met'] }}"><span style="width:{{ it['pct'] }}%"></span></div>
+    {% if not it['met'] %}
+      <p class="mini" style="margin:8px 0 0">Remaining: {{ it['remaining'] }} {{ it['unit'] }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<p class="mini">Computed from your entered completed-course record. Approved requirements: 121 core credits, 9 elective courses, 10 free credits.</p>
+
+<div class="card">
+  <h3 style="margin-top:0">Graduation confirmation request</h3>
+  {% if existing %}
+    <p>Your request status:
+      <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+    </p>
+    {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+    {% if existing['status'] == 'approved' %}
+      <a class="btn" href="{{ url_for('student_grad_letter') }}">View graduation letter</a>
+    {% elif existing['status'] == 'rejected' %}
+      <form method="post" style="margin-top:8px">
+        <input type="hidden" name="grad_semester" value="{{ existing['grad_semester'] or '' }}">
+        <button class="btn" type="submit">Resubmit request</button>
+      </form>
+    {% endif %}
+  {% else %}
+    <p class="mini">By submitting, you confirm that you expect to graduate this semester and ask your advisor to verify and approve your graduation requirements.</p>
+    <form method="post">
+      <div class="field" style="max-width:260px">
+        <label>Graduation semester</label>
+        <select name="grad_semester" required>
+          <option value="">— Select semester —</option>
+          {% for s in grad_semesters %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <label style="display:flex; align-items:center; gap:8px; margin-bottom:12px">
+        <input type="checkbox" required style="width:auto">
+        <span>I confirm the data is correct and I expect to graduate this semester</span>
+      </label>
+      <button class="btn" type="submit">Request graduation confirmation</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Track Certificate — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Track certificate request</h1>
+<p class="page-sub">Choose your track, then the two courses you've completed to prove certificate eligibility</p>
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last submitted request</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <form method="get" class="row-inline">
+    <div>
+      <label>Choose your track</label>
+      <select name="track" onchange="this.form.submit()">
+        <option value="">— Select track —</option>
+        {% for t in tracks %}
+        <option value="{{ t['key'] }}" {{ 'selected' if selected and selected['key']==t['key'] }}>{{ t['name'] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:0 0 auto"><button class="btn ghost" type="submit">Show courses</button></div>
+  </form>
+</div>
+
+{% if selected %}
+<form method="post">
+  <input type="hidden" name="track" value="{{ selected['key'] }}">
+  <div class="card">
+    <h3 style="margin-top:0">Courses — {{ selected['name'] }}</h3>
+    <p class="mini">Select the two courses you've completed (or will complete by the end of this semester)</p>
+    <div class="pick">
+      {% for c in selected['courses'] %}
+      <label class="pick-item">
+        <input type="checkbox" name="course" value="{{ c }}">
+        <span class="grow">{{ c }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <div style="margin-top:16px; display:flex; gap:10px; align-items:center">
+      <button class="btn" type="submit">Send for approval</button>
+      <span class="mini">In the official system a transcript is attached — to be added later.</span>
+    </div>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

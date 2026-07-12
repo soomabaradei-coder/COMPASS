@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Department dashboard</h1>
+<p class="page-sub">Overview of the COMPASS platform</p>
+
+<div class="grid cols-4">
+  <div class="card stat"><div class="num">{{ counts['students'] }}</div><div class="lbl">Students</div></div>
+  <div class="card stat"><div class="num">{{ counts['advisors'] }}</div><div class="lbl">Advisors</div></div>
+  <div class="card stat"><div class="num">{{ counts['courses'] }}</div><div class="lbl">Courses</div></div>
+  <div class="card stat"><div class="num">{{ counts['wishes'] }}</div><div class="lbl">Total preferences</div></div>
+</div>
+
+<div class="grid cols-3">
+  <a class="card" href="{{ url_for('admin_graduates') }}"><strong>Graduates</strong><p class="mini">Track every graduate: advisor approval, track, and requirements</p></a>
+  <a class="card" href="{{ url_for('admin_courses') }}"><strong>Manage courses</strong><p class="mini">Add and classify courses (core/elective/free, odd/even)</p></a>
+  <a class="card" href="{{ url_for('admin_semesters') }}"><strong>Semesters</strong><p class="mini">Name semesters and open/close preference collection</p></a>
+  <a class="card" href="{{ url_for('admin_users') }}"><strong>Users</strong><p class="mini">Students and advisors, and supervision assignment</p></a>
+</div>
+{% endblock %}

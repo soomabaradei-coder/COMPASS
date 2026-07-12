@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ task['label'] }} — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">{{ task['label'] }}</h1>
+<p class="page-sub">{{ task['desc'] }}</p>
+
+<div class="card center" style="padding:40px 24px">
+  <h3 style="margin:12px 0 6px">This task is under development</h3>
+  <p class="mini" style="max-width:460px;margin:0 auto">
+    This service will be available in an upcoming phase of COMPASS, and every step will
+    require academic-advisor approval before final confirmation.
+  </p>
+  <span class="badge pending" style="margin-top:16px;display:inline-block">Soon</span>
+</div>
+{% endblock %}

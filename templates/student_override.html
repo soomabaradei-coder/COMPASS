@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Waiver Request — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Waiver request</h1>
+<p class="page-sub">Submit a waiver request to your academic advisor — she will handle it</p>
+<p class="mini" style="margin:-14px 0 18px"><a href="{{ url_for('student_schedule_issues') }}">← Back to Schedule Issues</a></p>
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last submitted request</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<form method="post">
+  <div class="card">
+    <div class="field">
+      <label>Course / subject (optional)</label>
+      <select name="subject">
+        <option value="">— No specific course —</option>
+        {% for c in courses %}
+        <option value="{{ c['code'] }} — {{ c['name'] }}">{{ c['code'] }} — {{ c['name'] }}</option>
+        {% endfor %}
+      </select>
+      <p class="mini" style="margin:6px 0 0">Pick a course if the request relates to one, or leave empty.</p>
+    </div>
+    <div class="field">
+      <label>Request details &amp; reason *</label>
+      <textarea name="reason" rows="4" required
+        placeholder="Clearly describe what you'd like waived and why..."></textarea>
+    </div>
+    <button class="btn" type="submit">Send to advisor</button>
+    <span class="mini" style="margin-inline-start:10px">Your advisor reviews the request and takes the needed action.</span>
+  </div>
+</form>
+{% endblock %}

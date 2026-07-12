@@ -1,0 +1,17 @@
+{
+  "name": "COMPASS — Academic Advising",
+  "short_name": "COMPASS",
+  "description": "Computer Science Academic Support System — King Abdulaziz University",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f9f8",
+  "theme_color": "#0b731c",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

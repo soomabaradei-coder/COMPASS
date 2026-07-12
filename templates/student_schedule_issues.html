@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Schedule Issues — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Report a registration issue</h1>
+<p class="page-sub">Select the problem type and the affected sections (with reference numbers) to send to your advisor</p>
+<p class="mini" style="margin:-14px 0 18px">Need a general exception instead? <a href="{{ url_for('student_override') }}">Submit a Waiver Request →</a></p>
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last submitted issue</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<div class="card">
+  <form method="get" class="row-inline">
+    <div>
+      <label>Select your level &amp; block</label>
+      <select name="block" onchange="this.form.submit()">
+        <option value="">— Select block —</option>
+        {% for b in blocks %}
+        <option value="{{ b }}" {{ 'selected' if b==sel_block }}>{{ b }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:0 0 auto"><button class="btn ghost" type="submit">Show sections</button></div>
+  </form>
+</div>
+
+<form method="post">
+  <input type="hidden" name="block" value="{{ sel_block or '' }}">
+  <div class="card">
+    <label>Problem type</label>
+    <div class="pick" style="margin-top:8px">
+      {% for pt in problem_types %}
+      <label class="pick-item">
+        <input type="radio" name="problem_type" value="{{ pt }}" required style="width:auto">
+        <span class="grow">{{ pt }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if sel_block %}
+  <div class="card">
+    <h3 style="margin-top:0">{{ sel_block }} sections — mark the ones you had a problem with</h3>
+    <div class="pick">
+      {% for s in sections %}
+      <label class="pick-item">
+        <input type="checkbox" name="section" value="{{ s }}">
+        <span class="grow">{{ s }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <label>Additional note (optional)</label>
+    <textarea name="note" rows="2" placeholder="Add any details that help your advisor..."></textarea>
+    <button class="btn" type="submit" style="margin-top:12px">Submit issue</button>
+  </div>
+</form>
+{% endblock %}

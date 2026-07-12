@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}My Profile — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">My profile</h1>
+<p class="page-sub">Your academic details as recorded in the department</p>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h3 style="margin-top:0">Personal information</h3>
+    <table>
+      <tr><th style="width:45%">Name</th><td>{{ user['name'] }}</td></tr>
+      <tr><th>Email</th><td class="mini">{{ user['email'] }}</td></tr>
+      <tr><th>University ID</th><td>{{ st['university_id'] }}</td></tr>
+      <tr><th>Level</th><td>{{ st['level'] }}</td></tr>
+      <tr><th>Track</th><td>{{ st['track'] or 'Undeclared' }}</td></tr>
+      <tr><th>Admission term</th><td>{{ st['admission_semester'] }}</td></tr>
+    </table>
+    {% if not st['track'] %}<p class="mini" style="margin:10px 0 0">Your track is determined by your department elective courses (levels 9–10) and is declared through the Track Certificate.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">Academic advisor</h3>
+    <p><strong>{{ advisor['name'] if advisor else '—' }}</strong></p>
+    <p class="mini">{{ advisor['email'] if advisor else '' }}</p>
+    <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
+    <h3>Completed-courses summary</h3>
+    <table>
+      <tr><th>Core</th><td>{{ done.get('core',{}).get('cr',0) }} credits ({{ done.get('core',{}).get('n',0) }} courses)</td></tr>
+      <tr><th>Elective</th><td>{{ done.get('elective',{}).get('n',0) }} courses</td></tr>
+      <tr><th>Free</th><td>{{ done.get('free',{}).get('cr',0) }} credits</td></tr>
+    </table>
+  </div>
+</div>
+<p class="mini">To change any detail, contact your academic advisor.</p>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Summer Training — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Summer Training (CPCS-323)</h1>
+<p class="page-sub">200 training hours — requirement: complete all level 7 &amp; 8 courses</p>
+
+<div class="card" style="border-inline-start:3px solid var(--accent)">
+  <strong>Eligibility rules</strong>
+  <ul style="margin:8px 0 0; padding-inline-start:20px; line-height:2">
+    <li>Completed all level 7 &amp; 8 courses → <span class="badge approved">Eligible</span></li>
+    <li>Missing one or two courses → <span class="badge pending">Waiver required</span> (department approval)</li>
+    <li>Missing more than two courses → <span class="badge rejected">Not allowed</span></li>
+  </ul>
+</div>
+
+{% if existing %}
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px">
+    <strong>Last submitted request</strong>
+    <span class="badge {{ existing['status'] }}">{{ STATUS_AR[existing['status']] }}</span>
+  </div>
+  <p class="mini" style="margin:8px 0 0">{{ existing['details'] }}</p>
+  {% if existing['advisor_note'] %}<p class="mini">Advisor note: {{ existing['advisor_note'] }}</p>{% endif %}
+</div>
+{% endif %}
+
+<form method="post" id="stForm">
+  <div class="card">
+    <h3 style="margin-top:0">Select the courses you've completed</h3>
+    <div id="stBanner" class="eligible-banner" style="display:none"></div>
+    <div class="pick">
+      {% for c in courses %}
+      <label class="pick-item">
+        <input type="checkbox" class="stChk" name="passed" value="{{ c['code'] }}">
+        <span class="grow"><strong>{{ c['code'] }}</strong> — {{ c['name'] }}
+          <span class="meta">· Level {{ c['recommended_level'] }}</span></span>
+      </label>
+      {% endfor %}
+    </div>
+    <div style="margin-top:16px; display:flex; gap:10px; align-items:center">
+      <button class="btn" type="submit" id="stSubmit">Send for approval</button>
+      <span class="mini">The request is sent to your advisor for verification.</span>
+    </div>
+  </div>
+</form>
+
+<script>
+  (function(){
+    var total = {{ total }};
+    var chks = document.querySelectorAll('.stChk');
+    var banner = document.getElementById('stBanner');
+    var submit = document.getElementById('stSubmit');
+    function update(){
+      var done = 0; chks.forEach(function(c){ if(c.checked) done++; });
+      var missing = total - done;
+      banner.style.display = 'block';
+      if(missing === 0){
+        banner.className = 'eligible-banner yes';
+        banner.textContent = 'Eligible — you completed all level 7 & 8 courses';
+        submit.disabled = false; submit.textContent = 'Send for approval';
+      } else if(missing <= 2){
+        banner.className = 'eligible-banner no';
+        banner.textContent = 'Missing ' + missing + ' course(s) — you may submit as a waiver request for department approval';
+        submit.disabled = false; submit.textContent = 'Send as waiver request';
+      } else {
+        banner.className = 'eligible-banner';
+        banner.style.background = 'var(--danger-bg)'; banner.style.color = 'var(--danger)';
+        banner.textContent = 'Missing ' + missing + ' courses — you cannot apply for summer training';
+        submit.disabled = true;
+      }
+    }
+    chks.forEach(function(c){ c.addEventListener('change', update); });
+    update();
+  })();
+</script>
+{% endblock %}

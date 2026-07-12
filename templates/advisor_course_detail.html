@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Course Details — COMPASS{% endblock %}
+{% block content %}
+<a href="{{ url_for('advisor_stats') }}" class="mini">← Back to statistics</a>
+<h1 class="page-title" style="margin-top:8px">{{ course['code'] }} — {{ course['name'] }}</h1>
+<p class="page-sub">Students interested in registering this course</p>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Student</th><th>University ID</th><th>Level</th><th>Track</th><th>Preference status</th></tr></thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td>{{ s['name'] }}</td>
+        <td>{{ s['university_id'] }}</td>
+        <td>{{ s['level'] }}</td>
+        <td>{{ s['track'] or 'Undeclared' }}</td>
+        <td><span class="badge {{ s['status'] }}">{{ STATUS_AR[s['status']] }}</span></td>
+      </tr>
+      {% endfor %}
+      {% if not students %}<tr><td colspan="5" class="center mini">No students.</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

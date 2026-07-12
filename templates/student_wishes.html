@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Course Preferences — COMPASS{% endblock %}
+{% block student_content %}
+<h1 class="page-title">Next-semester course preferences</h1>
+<p class="page-sub">{{ sem['name'] if sem else '' }} — select the courses you'd like to register; they'll be sent to your advisor for approval</p>
+
+{% if not sem or not sem['wishes_open'] %}
+  <div class="card center">Preference collection is currently closed. Please check back later.</div>
+{% else %}
+<form method="post">
+  <div class="card">
+    <div class="pick">
+      {% for c in courses %}
+      {% set st = status_by_course.get(c['id']) %}
+      {% set is_locked = st in ['approved','rejected'] %}
+      <label class="pick-item {{ 'on' if (c['id']|string) in chosen }} {{ 'locked' if is_locked }}">
+        <input type="checkbox" name="course" value="{{ c['id'] }}"
+               {{ 'checked' if (c['id']|string) in chosen }} {{ 'disabled' if is_locked }}>
+        <span class="grow">
+          <strong>{{ c['code'] }}</strong> — {{ c['name'] }}
+          <span class="meta">· {{ c['credits'] }} cr · {{ PARITY_AR[c['parity']] }}</span>
+          {% if c['prereq'] %}<span class="meta">· Prereq: {{ c['prereq'] }}</span>{% endif %}
+        </span>
+        <span class="badge {{ c['type'] }}">{{ TYPE_AR[c['type']] }}</span>
+        {% if st %}<span class="badge {{ st }}">{{ STATUS_AR[st] }}</span>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    <div style="margin-top:18px; display:flex; gap:10px; align-items:center">
+      <button class="btn" type="submit">Save &amp; send for approval</button>
+      <span class="mini">Approved or rejected preferences can't be changed.</span>
+    </div>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

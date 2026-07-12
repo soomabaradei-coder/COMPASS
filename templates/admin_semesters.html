@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Semesters — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Semesters</h1>
+<p class="page-sub">Name semesters, activate them, and open/close preference collection</p>
+
+<div class="card">
+  <form method="post" class="row-inline">
+    <input type="hidden" name="action" value="add">
+    <div><label>Semester name</label><input name="name" required placeholder="Second Semester 2026"></div>
+    <div style="flex:0 0 auto"><button class="btn" type="submit">Add semester</button></div>
+  </form>
+</div>
+
+<div class="card table-wrap">
+  <table>
+    <thead><tr><th>Semester</th><th>Active</th><th>Preferences</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for s in semesters %}
+      <tr>
+        <td><strong>{{ s['name'] }}</strong></td>
+        <td>{{ 'Yes' if s['is_active'] else '—' }}</td>
+        <td>{% if s['wishes_open'] %}<span class="badge approved">Open</span>{% else %}<span class="badge rejected">Closed</span>{% endif %}</td>
+        <td style="display:flex; gap:6px; flex-wrap:wrap">
+          {% if not s['is_active'] %}
+          <form method="post" style="margin:0"><input type="hidden" name="action" value="activate"><input type="hidden" name="id" value="{{ s['id'] }}"><button class="btn sm" type="submit">Activate</button></form>
+          {% endif %}
+          <form method="post" style="margin:0"><input type="hidden" name="action" value="toggle_wishes"><input type="hidden" name="id" value="{{ s['id'] }}"><button class="btn sm {{ 'gray' if s['wishes_open'] else 'amber' }}" type="submit">{{ 'Close collection' if s['wishes_open'] else 'Open collection' }}</button></form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
