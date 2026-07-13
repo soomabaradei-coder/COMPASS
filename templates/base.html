@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}COMPASS{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=11">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=13">
   <link rel="icon" href="/static/icon-192.png">
   <link rel="manifest" href="/static/manifest.json">
   <meta name="theme-color" content="#0b731c">
@@ -94,10 +94,14 @@
     (function(){
       var t=document.getElementById('menuToggle');
       if(!t) return;
-      t.addEventListener('click', function(){ document.body.classList.toggle('nav-open'); });
+      var header=document.querySelector('.topbar'), side=document.querySelector('.sidebar');
+      function place(){ if(side&&header) side.style.top=header.offsetHeight+'px'; }
+      function close(){ document.body.classList.remove('nav-open'); }
+      t.addEventListener('click', function(){ place(); document.body.classList.toggle('nav-open'); });
       document.querySelectorAll('.side-link').forEach(function(a){
-        a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
+        a.addEventListener('click', close);
       });
+      window.addEventListener('resize', function(){ if(document.body.classList.contains('nav-open')) place(); });
     })();
   </script>
 </body>
