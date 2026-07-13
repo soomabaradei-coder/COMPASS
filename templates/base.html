@@ -89,7 +89,7 @@
 
   {% include '_bot.html' %}
   {% include '_install.html' %}
-  {% include '_tour.html' %}
+  {% if user and user['role'] == 'student' and request.endpoint == 'student_home' %}{% include '_tour.html' %}{% endif %}
   <script>
     (function(){
       var t=document.getElementById('menuToggle');
