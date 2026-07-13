@@ -1,0 +1,79 @@
+<style>
+.tour{position:fixed;inset:0;z-index:80}
+.tour[hidden]{display:none}
+.tour-ring{position:absolute;display:none;border-radius:12px;pointer-events:none;
+  box-shadow:0 0 0 3px rgba(11,115,28,.95), 0 0 0 9999px rgba(14,21,18,.55);
+  transition:top .2s,left .2s,width .2s,height .2s}
+.tour-tip{position:absolute;z-index:81;background:#fff;border:1px solid var(--line,#e7ece8);
+  border-radius:14px;box-shadow:0 16px 44px rgba(14,21,18,.22);width:288px;max-width:calc(100vw - 28px);padding:15px}
+.tour-tip .h{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.tour-tip .h img{width:32px;height:32px;border-radius:50%;background:#fff}
+.tour-tip .h b{font-size:14px;color:var(--ink,#0e1512)}
+.tour-tip p{font-size:13px;color:var(--muted,#5c6b62);margin:0 0 13px;line-height:1.6}
+.tour-tip .row{display:flex;justify-content:space-between;align-items:center}
+.tour-tip .dots{font-size:11px;color:var(--faint,#8a978e)}
+.tour-tip .btns{display:flex;gap:8px}
+.tour-tip .skip{font-size:12px;color:var(--faint,#8a978e);background:none;border:none;cursor:pointer;font-family:inherit}
+.tour-tip .next{background:var(--accent,#0b731c);color:#fff;border:none;border-radius:9px;padding:8px 16px;
+  font-weight:600;font-size:13px;cursor:pointer;font-family:inherit}
+</style>
+
+<div class="tour" id="tour" hidden>
+  <div class="tour-ring" id="tourRing"></div>
+  <div class="tour-tip" id="tourTip">
+    <div class="h"><img src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot"><b>COMPASS-Bot</b></div>
+    <p id="tourText"></p>
+    <div class="row">
+      <span class="dots" id="tourDots"></span>
+      <span class="btns">
+        <button class="skip" id="tourSkip" type="button">Skip</button>
+        <button class="next" id="tourNext" type="button">Next</button>
+      </span>
+    </div>
+  </div>
+</div>
+<script>
+  (function(){
+    try{ if(localStorage.getItem('compass_tour_done')) return; }catch(e){}
+    var tour=document.getElementById('tour'), ring=document.getElementById('tourRing'),
+        tip=document.getElementById('tourTip'), txt=document.getElementById('tourText'),
+        dots=document.getElementById('tourDots'), next=document.getElementById('tourNext'), skip=document.getElementById('tourSkip');
+    if(!tour) return;
+    var menuBtn=document.getElementById('menuToggle');
+    var menuVisible = menuBtn && getComputedStyle(menuBtn).display!=='none';
+    var navEl = menuVisible ? menuBtn : document.querySelector('.sidebar');
+    var fab=document.getElementById('botFab');
+    var steps=[];
+    if(navEl) steps.push({el:navEl, text: menuVisible
+      ? "This is your menu. Tap here anytime to open your tasks — your whole journey from enrollment to graduation."
+      : "This is your task menu — your whole journey from enrollment to graduation. Pick any step from here."});
+    if(fab) steps.push({el:fab, text:"And I'm COMPASS-Bot. Ask me about any course, level, block, or how any task works — anytime."});
+    steps.push({el:null, text:"That's it — you're ready. Welcome to COMPASS."});
+    if(!steps.length){ return; }
+    var i=0;
+    function place(s){
+      tip.style.transform='';
+      if(s.el){
+        var r=s.el.getBoundingClientRect(), p=6;
+        ring.style.display='block';
+        ring.style.top=(r.top-p)+'px'; ring.style.left=(r.left-p)+'px';
+        ring.style.width=(r.width+p*2)+'px'; ring.style.height=(r.height+p*2)+'px';
+        var w=Math.min(288, window.innerWidth-28);
+        tip.style.left=Math.max(14, Math.min(window.innerWidth-w-14, r.left))+'px';
+        if(r.bottom+190 < window.innerHeight){ tip.style.top=(r.bottom+12)+'px'; }
+        else { tip.style.top=Math.max(14, r.top-190)+'px'; }
+      } else {
+        ring.style.display='none';
+        tip.style.left='50%'; tip.style.top='50%'; tip.style.transform='translate(-50%,-50%)';
+      }
+      txt.textContent=s.text;
+      dots.textContent=(i+1)+' / '+steps.length;
+      next.textContent=(i===steps.length-1)?'Got it':'Next';
+    }
+    function done(){ tour.hidden=true; try{localStorage.setItem('compass_tour_done','1');}catch(e){} }
+    next.addEventListener('click', function(){ i++; if(i>=steps.length){done();return;} place(steps[i]); });
+    skip.addEventListener('click', done);
+    window.addEventListener('resize', function(){ if(!tour.hidden) place(steps[i]); });
+    setTimeout(function(){ tour.hidden=false; place(steps[0]); }, 400);
+  })();
+</script>

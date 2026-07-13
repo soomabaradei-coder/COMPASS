@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}COMPASS{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=10">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=11">
   <link rel="icon" href="/static/icon-192.png">
   <link rel="manifest" href="/static/manifest.json">
   <meta name="theme-color" content="#0b731c">
@@ -19,6 +19,9 @@
   {% if user %}
   <header class="topbar">
     <div class="topbar-inner">
+      {% if user['role'] == 'student' %}
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
+      {% endif %}
       <a class="brand" href="{{ url_for('about') }}">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="COMPASS">
         <span class="sub">Academic Advising</span>
@@ -86,5 +89,16 @@
 
   {% include '_bot.html' %}
   {% include '_install.html' %}
+  {% include '_tour.html' %}
+  <script>
+    (function(){
+      var t=document.getElementById('menuToggle');
+      if(!t) return;
+      t.addEventListener('click', function(){ document.body.classList.toggle('nav-open'); });
+      document.querySelectorAll('.side-link').forEach(function(a){
+        a.addEventListener('click', function(){ document.body.classList.remove('nav-open'); });
+      });
+    })();
+  </script>
 </body>
 </html>
