@@ -145,12 +145,24 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 .content{flex:1;min-width:0;padding:28px 24px 64px}
 @media(max-width:820px){
   .shell{flex-direction:column}
-  .sidebar{width:100%;flex:none;min-height:0;position:static;
+  /* Warm, comfortable, vertical task list on phones */
+  .sidebar{width:100%;flex:none;min-height:0;position:static;display:block;
+    background:#faf7f1;                       /* warm cream surface */
     border-inline-start:none;border-bottom:1px solid var(--line);
-    display:flex;flex-wrap:wrap;gap:6px;padding:10px}
-  .sidebar-title,.side-section{width:100%;padding:6px 8px 2px}
-  .side-link{margin-bottom:0}
-  .content{padding:20px 16px 52px}
+    padding:16px 14px 10px}
+  .sidebar-title{font-size:17px;padding:2px 6px 8px}
+  .side-section{padding:14px 6px 8px;font-size:12.5px;color:var(--muted)}
+  .side-group{margin-bottom:2px}
+  .side-group > .side-items{display:block}   /* show tasks (no accordion collapse on mobile) */
+  .side-section .chev{display:none}
+  .side-link{padding:15px 16px;font-size:15.5px;border-radius:16px;margin-bottom:8px;
+    background:#fff;border:1px solid var(--line);gap:12px}
+  .side-link::before{width:9px;height:9px}
+  .side-link:hover{background:#fff}
+  .side-link.active{background:var(--accent);border-color:var(--accent);color:#fff;
+    box-shadow:0 6px 16px rgba(11,115,28,.20)}
+  .side-link .lbl{line-height:1.35}
+  .content{padding:18px 16px 54px}
 }
 
 .mini{font-size:12.5px;color:var(--faint)}
@@ -159,26 +171,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 .eligible-banner.yes{background:var(--accent-soft);color:var(--accent)}
 .eligible-banner.no{background:var(--amber-bg);color:var(--amber)}
 
-/* COMPASS-Bot floating widget */
-.bot-fab{position:fixed;bottom:22px;right:22px;z-index:60;background:var(--accent);
-  border:none;border-radius:50%;padding:0;width:58px;height:58px;cursor:pointer;
-  box-shadow:0 6px 22px rgba(11,115,28,.28);display:flex;align-items:center;justify-content:center}
-.bot-fab:hover{background:#095c16}
-.bot-fab img{width:42px;height:42px;border-radius:50%;background:#fff}
-.bot-panel{position:fixed;bottom:74px;right:22px;z-index:60;width:344px;max-width:calc(100vw - 44px);
-  height:452px;max-height:calc(100vh - 120px);background:#fff;border:1px solid var(--line);
-  border-radius:16px;box-shadow:0 16px 48px rgba(14,21,18,.16);display:flex;flex-direction:column;overflow:hidden}
-.bot-panel[hidden]{display:none}
-.bot-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px}
-.bot-head .bot-face{width:36px;height:36px;border-radius:50%;background:#fff;flex:0 0 auto}
-.bot-head b{font-size:14px}
-.bot-head .sub{display:block;font-size:11px;color:var(--faint);font-weight:500;margin-top:2px}
-.bot-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
-.bot-msg{max-width:86%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.6}
-.bot-msg.bot{background:var(--panel);color:var(--ink);align-self:flex-start;border-bottom-left-radius:4px}
-.bot-msg.me{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-.bot-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
-.bot-input input{flex:1}
 
 @media print{
   .topbar,.sidebar,.no-print,.page-title,.page-sub,.bot-fab,.bot-panel{display:none!important}

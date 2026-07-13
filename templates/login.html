@@ -59,6 +59,10 @@
   <link rel="manifest" href="/static/manifest.json">
   <meta name="theme-color" content="#0b731c">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="COMPASS">
   <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </head>
 <body>
@@ -72,7 +76,7 @@
   <div class="stage">
     <div class="card">
       <div class="eyebrow mono">Sign in</div>
-      <h1>Welcome back</h1>
+      <h1>Welcome to COMPASS</h1>
       <div class="sub">Computer Science Academic Support System</div>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -91,6 +95,10 @@
         <button class="btn" type="submit">Sign in →</button>
       </form>
 
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted)">
+        New to COMPASS? <a href="{{ url_for('signup') }}" style="color:var(--accent);font-weight:600">Create an account</a>
+      </div>
+
       <div class="demo">
         <div class="lbl mono">Demo accounts</div>
         <div class="row"><span class="role">Admin</span><span><code>admin@compass.edu</code> · <code>admin123</code></span></div>
@@ -99,5 +107,7 @@
       </div>
     </div>
   </div>
+  {% include '_bot.html' %}
+  {% include '_install.html' %}
 </body>
 </html>

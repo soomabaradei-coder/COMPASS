@@ -4,4 +4,18 @@
    Use a production WSGI server instead.
  * Debug mode: off
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
-127.0.0.1 - - [13/Jul/2026 01:59:15] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jul/2026 03:16:44] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jul/2026 03:16:44] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:44] "GET /static/bot-avatar.png?v=2 HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:44] "GET /static/icon-192.png HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:44] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:44] "GET /static/icon-192.png HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:46] "GET /sw.js HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /admin/blocks HTTP/1.1" 200 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /static/logo.png HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /static/styles.css?v=10 HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /static/bot-avatar.png?v=2 HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /static/icon-192.png HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /static/manifest.json HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:16:58] "GET /static/icon-192.png HTTP/1.1" 304 -
+127.0.0.1 - - [13/Jul/2026 03:17:01] "GET /sw.js HTTP/1.1" 200 -

@@ -35,7 +35,7 @@
     {% for b in blocks %}
     <label class="card" style="cursor:pointer; display:block">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
-        <input type="radio" name="block" value="{{ b['name'] }}" style="width:auto" required>
+        <input type="radio" name="block" value="{{ b['id'] }}" style="width:auto" required>
         <strong>{{ b['name'] }}</strong>
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:6px">

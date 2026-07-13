@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Blocks — COMPASS{% endblock %}
+{% block content %}
+<h1 class="page-title">Manage blocks</h1>
+<p class="page-sub">Add ready-made blocks per level; students choose from them, and you see how many picked each</p>
+
+<div class="card">
+  <h3 style="margin-top:0">Add a block</h3>
+  <form method="post">
+    <input type="hidden" name="action" value="add">
+    <div class="row-inline">
+      <div>
+        <label>Level</label>
+        <input name="level_group" list="lvlopts" required placeholder="Level 5 / 6">
+        <datalist id="lvlopts">
+          {% for l in level_options %}<option value="{{ l }}">{% endfor %}
+        </datalist>
+      </div>
+      <div><label>Block name</label><input name="name" required placeholder="Block 1"></div>
+      <div style="flex:2"><label>Courses (comma-separated)</label><input name="courses" required placeholder="CPCS 214, CPCS 223, CPCS 241"></div>
+      <div style="flex:0 0 auto"><button class="btn" type="submit">Add</button></div>
+    </div>
+  </form>
+</div>
+
+{% for group, blocks in grouped.items() %}
+<div class="card">
+  <h3 style="margin-top:0">{{ group }}</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Block</th><th>Courses</th><th>Students</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for b in blocks %}
+        <tr class="{{ '' if b['is_active'] else 'locked' }}">
+          <td><strong>{{ b['name'] }}</strong></td>
+          <td>
+            {% for c in b['courses'].split(',') %}<span class="badge core">{{ c.strip() }}</span> {% endfor %}
+          </td>
+          <td><span class="badge {{ 'approved' if counts.get(b['id']) else '' }}" style="font-size:14px;font-weight:800">{{ counts.get(b['id'], 0) }}</span></td>
+          <td>{{ 'Active' if b['is_active'] else 'Disabled' }}</td>
+          <td>
+            <form method="post" style="margin:0">
+              <input type="hidden" name="action" value="toggle">
+              <input type="hidden" name="id" value="{{ b['id'] }}">
+              <button class="btn sm gray" type="submit">{{ 'Disable' if b['is_active'] else 'Enable' }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endfor %}
+{% if not grouped %}<div class="card center mini">No blocks yet — add one above.</div>{% endif %}
+{% endblock %}

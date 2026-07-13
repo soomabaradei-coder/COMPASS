@@ -89,6 +89,10 @@
   <link rel="manifest" href="/static/manifest.json">
   <meta name="theme-color" content="#0b731c">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="COMPASS">
   <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </head>
 <body>
@@ -116,9 +120,10 @@
   <section>
     <div class="wrap">
       <div class="eyebrow mono"><span class="idx">01</span> &nbsp;Overview</div>
-      <div class="section-head"><h2>Advising, rebuilt as software.</h2></div>
-      <p class="lead">COMPASS replaces manual, paper-based advising with a single digital system built for
-        transparency, efficiency, and academic quality — aligned with Saudi Vision 2030 and ABET accreditation standards.</p>
+      <div class="section-head"><h2>Beyond Digital Transformation.<br>Toward Intelligent Academic Services.</h2></div>
+      <p class="lead">COMPASS transforms academic services through artificial intelligence — moving beyond
+        digitized processes to intelligent automation, personalized student support, and data-driven
+        academic decision-making.</p>
     </div>
   </section>
 
@@ -197,5 +202,7 @@
       {% else %}<a class="mono" href="{{ url_for('login') }}">Sign in →</a>{% endif %}
     </footer>
   </div>
+  {% include '_bot.html' %}
+  {% include '_install.html' %}
 </body>
 </html>

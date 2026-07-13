@@ -10,7 +10,7 @@ from flask import (
     Flask, request, redirect, url_for, session, render_template, flash,
     abort, send_file,
 )
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from db import get_db, init_db
 from plan_data import (BLOCKS, CHALLENGE_BLOCKS, CHALLENGE_TYPES, blocks_group_for_level)
 
@@ -363,8 +363,7 @@ def bot_answer(q):
 
 @app.route("/bot/ask", methods=["POST"])
 def bot_ask():
-    if not current_user():
-        abort(403)
+    # Public — answers only from the CS study plan (no sensitive data).
     data = request.get_json(silent=True) or {}
     return {"answer": bot_answer(data.get("question", ""))}
 
@@ -380,6 +379,61 @@ def login():
             return redirect(url_for(f"{u['role']}_home"))
         flash("Incorrect email or password", "error")
     return render_template("login.html")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    db = get_db()
+    advisors = db.execute("SELECT id, name FROM users WHERE role='advisor' ORDER BY name").fetchall()
+    if request.method == "POST":
+        f = request.form
+        role = f.get("role")
+        name = f.get("name", "").strip()
+        email = f.get("email", "").strip().lower()
+        pw, pw2 = f.get("password", ""), f.get("password2", "")
+        if role not in ("student", "advisor") or not name or not email or not pw:
+            flash("Please fill in all required fields", "error")
+            return redirect(url_for("signup"))
+        if len(pw) < 6:
+            flash("Password must be at least 6 characters", "error")
+            return redirect(url_for("signup"))
+        if pw != pw2:
+            flash("Passwords do not match", "error")
+            return redirect(url_for("signup"))
+        if role == "student" and not email.endswith("@stu.kau.edu.sa"):
+            flash("Student email must be a @stu.kau.edu.sa address", "error")
+            return redirect(url_for("signup"))
+        if role == "advisor" and not email.endswith("@kau.edu.sa"):
+            flash("Advisor email must be a @kau.edu.sa address", "error")
+            return redirect(url_for("signup"))
+        if db.execute("SELECT 1 FROM users WHERE email=?", (email,)).fetchone():
+            flash("An account with this email already exists", "error")
+            return redirect(url_for("signup"))
+        if role == "student":
+            uid = f.get("university_id", "").strip()
+            level = f.get("level", "").strip()
+            advisor_id = f.get("advisor_id", "")
+            if not (uid and level and advisor_id):
+                flash("Students must provide university ID, level, and advisor", "error")
+                return redirect(url_for("signup"))
+            if db.execute("SELECT 1 FROM students WHERE university_id=?", (uid,)).fetchone():
+                flash("This university ID is already registered", "error")
+                return redirect(url_for("signup"))
+            cur = db.execute("INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,'student')",
+                             (name, email, generate_password_hash(pw)))
+            uid_row = cur.lastrowid
+            db.execute("""INSERT INTO students(user_id,university_id,level,track,advisor_id,admission_semester)
+                          VALUES(?,?,?,?,?,?)""",
+                       (uid_row, uid, int(level), None, int(advisor_id), ""))
+        else:
+            cur = db.execute("INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,'advisor')",
+                             (name, email, generate_password_hash(pw)))
+            uid_row = cur.lastrowid
+        db.commit()
+        session["uid"] = uid_row
+        flash("Account created — welcome to COMPASS", "success")
+        return redirect(url_for(f"{role}_home"))
+    return render_template("signup.html", advisors=advisors)
 
 
 @app.route("/logout")
@@ -580,25 +634,33 @@ def student_blocks():
     db = get_db()
     st = get_student(session["uid"])
     existing = latest_request(st["id"], "block")
+    order = list(BLOCKS.keys())
+    groups = [r["level_group"] for r in
+              db.execute("SELECT DISTINCT level_group FROM blocks WHERE is_active=1").fetchall()]
+    groups = sorted(set(groups), key=lambda g: order.index(g) if g in order else 99)
     group = request.args.get("group") or blocks_group_for_level(st["level"])
-    blocks = BLOCKS.get(group, [])
+    if groups and group not in groups:
+        group = groups[0]
     if request.method == "POST":
-        chosen = request.form.get("block")
-        grp = request.form.get("group")
-        block = next((b for b in BLOCKS.get(grp, []) if b["name"] == chosen), None)
+        block = db.execute("SELECT * FROM blocks WHERE id=? AND is_active=1",
+                           (request.form.get("block"),)).fetchone()
         if not block:
             flash("Please choose a valid block", "error")
-            return redirect(url_for("student_blocks", group=grp))
-        details = f"{grp} — {block['name']}: " + ", ".join(block["courses"])
+            return redirect(url_for("student_blocks", group=request.form.get("group")))
+        details = f"{block['level_group']} — {block['name']}: {block['courses']}"
         db.execute(
-            "INSERT INTO requests(student_id,type,title,details,status) VALUES(?,?,?,?,'pending')",
-            (st["id"], "block", "Block Selection", details),
+            "INSERT INTO requests(student_id,type,title,details,status,block_id) VALUES(?,?,?,?,'pending',?)",
+            (st["id"], "block", "Block Selection", details, block["id"]),
         )
         db.commit()
         flash("Your block choice was sent to your advisor for approval", "success")
         return redirect(url_for("student_blocks"))
+    rows = db.execute("SELECT * FROM blocks WHERE level_group=? AND is_active=1 ORDER BY id",
+                      (group,)).fetchall()
+    blocks = [{"id": r["id"], "name": r["name"],
+               "courses": [c.strip() for c in r["courses"].split(",") if c.strip()]} for r in rows]
     return render_template("student_blocks.html", st=st, group=group,
-                           groups=list(BLOCKS.keys()), blocks=blocks, existing=existing)
+                           groups=groups, blocks=blocks, existing=existing)
 
 
 @app.route("/student/schedule-issues", methods=["GET", "POST"])
@@ -1061,6 +1123,41 @@ def admin_graduates_export():
     buf.seek(0)
     return send_file(buf, as_attachment=True, attachment_filename="compass_graduates.xlsx",
                      mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
+@app.route("/admin/blocks", methods=["GET", "POST"])
+@login_required("admin")
+def admin_blocks():
+    db = get_db()
+    if request.method == "POST":
+        action = request.form.get("action")
+        if action == "add":
+            lg = request.form.get("level_group", "").strip()
+            name = request.form.get("name", "").strip()
+            courses = request.form.get("courses", "").strip()
+            if lg and name and courses:
+                db.execute("INSERT INTO blocks(level_group,name,courses,is_active) VALUES(?,?,?,1)",
+                           (lg, name, courses))
+                db.commit()
+                flash("Block added", "success")
+            else:
+                flash("Please fill in level, block name, and courses", "error")
+        elif action == "toggle":
+            db.execute("UPDATE blocks SET is_active = 1 - is_active WHERE id=?", (request.form.get("id"),))
+            db.commit()
+        return redirect(url_for("admin_blocks"))
+    # number of students who chose each block (distinct students)
+    counts = {r["block_id"]: r["n"] for r in db.execute(
+        """SELECT block_id, COUNT(DISTINCT student_id) AS n FROM requests
+           WHERE type='block' AND block_id IS NOT NULL GROUP BY block_id""").fetchall()}
+    order = list(BLOCKS.keys())
+    rows = db.execute("SELECT * FROM blocks ORDER BY level_group, id").fetchall()
+    grouped = {}
+    for r in rows:
+        grouped.setdefault(r["level_group"], []).append(r)
+    grouped = dict(sorted(grouped.items(), key=lambda kv: order.index(kv[0]) if kv[0] in order else 99))
+    return render_template("admin_blocks.html", grouped=grouped, counts=counts,
+                           level_options=order)
 
 
 def teams_rows():

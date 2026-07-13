@@ -1,0 +1,66 @@
+<style>
+.bot-fab{position:fixed;bottom:22px;right:22px;z-index:60;background:var(--accent,#0b731c);border:none;
+  border-radius:50%;padding:0;width:58px;height:58px;cursor:pointer;
+  box-shadow:0 6px 22px rgba(11,115,28,.28);display:flex;align-items:center;justify-content:center}
+.bot-fab:hover{background:#095c16}
+.bot-fab img{width:42px;height:42px;border-radius:50%;background:#fff}
+.bot-panel{position:fixed;bottom:74px;right:22px;z-index:60;width:344px;max-width:calc(100vw - 44px);
+  height:452px;max-height:calc(100vh - 120px);background:#fff;border:1px solid var(--line,#e7ece8);
+  border-radius:16px;box-shadow:0 16px 48px rgba(14,21,18,.16);display:flex;flex-direction:column;
+  overflow:hidden;direction:ltr;text-align:left}
+.bot-panel[hidden]{display:none}
+.bot-head{padding:12px 16px;border-bottom:1px solid var(--line,#e7ece8);display:flex;align-items:center;gap:11px}
+.bot-head .bot-face{width:36px;height:36px;border-radius:50%;background:#fff;flex:0 0 auto}
+.bot-head b{font-size:14px;color:var(--ink,#0e1512)}
+.bot-head .sub{display:block;font-size:11px;color:var(--faint,#8a978e);font-weight:500;margin-top:2px}
+.bot-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.bot-msg{max-width:86%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.6}
+.bot-msg.bot{background:var(--panel,#f2f6f3);color:var(--ink,#0e1512);align-self:flex-start;border-bottom-left-radius:4px}
+.bot-msg.me{background:var(--accent,#0b731c);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.bot-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line,#e7ece8)}
+.bot-input input{flex:1;padding:9px 12px;border:1px solid var(--line,#e7ece8);border-radius:10px;
+  font-family:inherit;font-size:14px;background:#fff}
+.bot-send{background:var(--accent,#0b731c);color:#fff;border:none;border-radius:10px;padding:0 16px;
+  font-family:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.bot-send:hover{background:#095c16}
+@media print{.bot-fab,.bot-panel{display:none!important}}
+</style>
+
+<button class="bot-fab" id="botFab" aria-label="Ask COMPASS-Bot" title="Ask COMPASS-Bot">
+  <img src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot"></button>
+<div class="bot-panel" id="botPanel" hidden>
+  <div class="bot-head">
+    <img class="bot-face" src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot">
+    <div><b>COMPASS-Bot</b><span class="sub">Answers from the CS study plan only</span></div>
+  </div>
+  <div class="bot-msgs" id="botMsgs">
+    <div class="bot-msg bot">Hi! Ask me about the CS plan — a course (e.g. CPCS-204), a level (e.g. level 7), or a block — or how a task works (e.g. "what do I need for summer training?").</div>
+  </div>
+  <div class="bot-input">
+    <input id="botInput" type="text" placeholder="Ask about the CS plan…" autocomplete="off">
+    <button class="bot-send" id="botSend" type="button">Send</button>
+  </div>
+</div>
+<script>
+  (function(){
+    var fab=document.getElementById('botFab'), panel=document.getElementById('botPanel');
+    var msgs=document.getElementById('botMsgs'), input=document.getElementById('botInput'), send=document.getElementById('botSend');
+    if(!fab) return;
+    function add(text, who){var d=document.createElement('div');d.className='bot-msg '+who;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d;}
+    fab.addEventListener('click',function(){
+      if(panel.hasAttribute('hidden')){panel.removeAttribute('hidden');input.focus();}
+      else{panel.setAttribute('hidden','');}
+    });
+    function ask(){
+      var q=input.value.trim(); if(!q) return;
+      add(q,'me'); input.value='';
+      var typing=add('…','bot');
+      fetch('/bot/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})})
+        .then(function(r){return r.json();})
+        .then(function(d){typing.textContent=d.answer||'—';})
+        .catch(function(){typing.textContent='Sorry, something went wrong.';});
+    }
+    send.addEventListener('click',ask);
+    input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();ask();}});
+  })();
+</script>

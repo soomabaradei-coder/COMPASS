@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create account — COMPASS</title>
+  <style>
+    :root{
+      --ink:#0e1512; --muted:#5c6b62; --faint:#8a978e;
+      --line:#e7ece8; --bg:#ffffff; --panel:#f7faf8;
+      --accent:#0b731c; --accent-soft:#eaf6ec; --danger:#c0392b; --danger-bg:#fdecea;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:"Inter","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+      color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+      min-height:100vh;display:flex;flex-direction:column;background:var(--bg);
+      background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px}
+    .mono{font-family:"SF Mono",ui-monospace,"JetBrains Mono","Menlo",monospace}
+    a{color:inherit;text-decoration:none}
+    .top{height:62px;border-bottom:1px solid var(--line);display:flex;align-items:center;
+      background:rgba(255,255,255,.9);backdrop-filter:blur(8px)}
+    .top .inner{max-width:980px;margin:0 auto;width:100%;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
+    .brand img{height:20px}
+    .top a.back{font-size:13px;color:var(--muted)}
+    .top a.back:hover{color:var(--ink)}
+    .stage{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+    .card{width:100%;max-width:420px;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:34px}
+    .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:600}
+    h1{font-size:24px;letter-spacing:-.5px;font-weight:750;margin:10px 0 4px}
+    .card .sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+    label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:6px;letter-spacing:.01em}
+    input,select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;
+      font-family:inherit;font-size:14px;background:var(--bg);transition:.15s}
+    input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    .field{margin-bottom:15px}
+    .two{display:flex;gap:12px}
+    .two>*{flex:1}
+    .btn{width:100%;margin-top:8px;background:var(--accent);color:#fff;font-weight:600;font-size:14px;
+      padding:12px;border:none;border-radius:10px;cursor:pointer;font-family:inherit}
+    .btn:hover{background:#095c16}
+    .flash{padding:11px 14px;border-radius:10px;margin-bottom:18px;font-size:13.5px;font-weight:500}
+    .flash.error{background:var(--danger-bg);color:var(--danger)}
+    .flash.success{background:var(--accent-soft);color:var(--accent)}
+    .seg{display:flex;gap:8px;margin-bottom:18px}
+    .seg label{flex:1;text-align:center;padding:11px;border:1px solid var(--line);border-radius:10px;
+      cursor:pointer;font-size:14px;font-weight:600;color:var(--muted);margin:0}
+    .seg input{display:none}
+    .seg label.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+    .foot{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
+    .foot a{color:var(--accent);font-weight:600}
+  </style>
+  <link rel="icon" href="/static/icon-192.png">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#0b731c">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="COMPASS">
+</head>
+<body>
+  <div class="top">
+    <div class="inner">
+      <a class="brand" href="{{ url_for('about') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="COMPASS">COMPASS</a>
+      <a class="back" href="{{ url_for('login') }}">← Sign in</a>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="card">
+      <div class="eyebrow mono">Create account</div>
+      <h1>Join COMPASS</h1>
+      <div class="sub">Computer Science Academic Support System</div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, msg in messages %}<div class="flash {{ category }}">{{ msg }}</div>{% endfor %}
+      {% endwith %}
+
+      <form method="post" id="signupForm">
+        <div class="seg" id="seg">
+          <label id="roleStudentLbl" class="on"><input type="radio" name="role" value="student" checked>Student</label>
+          <label id="roleAdvisorLbl"><input type="radio" name="role" value="advisor">Advisor</label>
+        </div>
+
+        <div class="field"><label>Full name</label><input name="name" required placeholder="Your full name"></div>
+        <div class="field"><label>Email</label><input type="email" name="email" required placeholder="name@kau.edu.sa"></div>
+        <div class="two">
+          <div class="field"><label>Password</label><input type="password" name="password" required placeholder="At least 6 characters"></div>
+          <div class="field"><label>Confirm</label><input type="password" name="password2" required placeholder="Repeat"></div>
+        </div>
+
+        <div id="studentFields">
+          <div class="two">
+            <div class="field"><label>University ID</label><input name="university_id" placeholder="21xxxxx"></div>
+            <div class="field"><label>Level</label>
+              <select name="level"><option value="">—</option>
+                {% for n in range(1,11) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Academic advisor</label>
+            <select name="advisor_id">
+              <option value="">— Select your advisor —</option>
+              {% for a in advisors %}<option value="{{ a['id'] }}">{{ a['name'] }}</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <button class="btn" type="submit">Create account</button>
+      </form>
+
+      <div class="foot">Already have an account? <a href="{{ url_for('login') }}">Sign in</a></div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      var sLbl=document.getElementById('roleStudentLbl'), aLbl=document.getElementById('roleAdvisorLbl');
+      var sf=document.getElementById('studentFields');
+      var emailIn=document.querySelector('[name="email"]');
+      var sIn=sLbl.querySelector('input'), aIn=aLbl.querySelector('input');
+      var reqNames=['university_id','level','advisor_id'];
+      function setReq(on){ reqNames.forEach(function(n){ var el=sf.querySelector('[name="'+n+'"]'); if(el){ if(on) el.setAttribute('required','required'); else el.removeAttribute('required'); } }); }
+      function apply(){
+        var student = sIn.checked;
+        sLbl.classList.toggle('on', student); aLbl.classList.toggle('on', !student);
+        sf.style.display = student ? 'block' : 'none';
+        if(emailIn) emailIn.placeholder = student ? 'name@stu.kau.edu.sa' : 'name@kau.edu.sa';
+        setReq(student);
+      }
+      sIn.addEventListener('change', apply); aIn.addEventListener('change', apply);
+      apply();
+    })();
+  </script>
+  {% include '_bot.html' %}
+</body>
+</html>

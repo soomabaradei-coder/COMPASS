@@ -4,11 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}COMPASS{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=9">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=10">
   <link rel="icon" href="/static/icon-192.png">
   <link rel="manifest" href="/static/manifest.json">
   <meta name="theme-color" content="#0b731c">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="COMPASS">
   <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </head>
 <body>
@@ -30,6 +34,7 @@
           <a href="{{ url_for('admin_home') }}" class="{{ 'active' if ep=='admin_home' }}">Dashboard</a>
           <a href="{{ url_for('admin_graduates') }}" class="{{ 'active' if ep=='admin_graduates' }}">Graduates</a>
           <a href="{{ url_for('admin_teams') }}" class="{{ 'active' if ep=='admin_teams' }}">Teams</a>
+          <a href="{{ url_for('admin_blocks') }}" class="{{ 'active' if ep=='admin_blocks' }}">Blocks</a>
           <a href="{{ url_for('admin_courses') }}" class="{{ 'active' if ep=='admin_courses' }}">Courses</a>
           <a href="{{ url_for('admin_semesters') }}" class="{{ 'active' if ep=='admin_semesters' }}">Semesters</a>
           <a href="{{ url_for('admin_users') }}" class="{{ 'active' if ep=='admin_users' }}">Users</a>
@@ -79,44 +84,7 @@
   </main>
   {% endif %}
 
-  {% if user %}
-  <button class="bot-fab" id="botFab" aria-label="Ask COMPASS-Bot" title="Ask COMPASS-Bot"><img src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot"></button>
-  <div class="bot-panel" id="botPanel" hidden>
-    <div class="bot-head">
-      <img class="bot-face" src="/static/bot-avatar.png?v=2" alt="COMPASS-Bot">
-      <div><b>COMPASS-Bot</b><span class="sub">Answers from the CS study plan only</span></div>
-    </div>
-    <div class="bot-msgs" id="botMsgs">
-      <div class="bot-msg bot">Hi! Ask me about the CS plan — a course (e.g. CPCS-204), a level (e.g. level 7), or a block — or how a task works (e.g. "what do I need for summer training?").</div>
-    </div>
-    <div class="bot-input">
-      <input id="botInput" type="text" placeholder="Ask about the CS plan…" autocomplete="off">
-      <button class="btn sm" id="botSend" type="button">Send</button>
-    </div>
-  </div>
-  <script>
-    (function(){
-      var fab=document.getElementById('botFab'), panel=document.getElementById('botPanel');
-      var msgs=document.getElementById('botMsgs'), input=document.getElementById('botInput'), send=document.getElementById('botSend');
-      if(!fab) return;
-      function add(text, who){var d=document.createElement('div');d.className='bot-msg '+who;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d;}
-      fab.addEventListener('click',function(){
-        if(panel.hasAttribute('hidden')){panel.removeAttribute('hidden');input.focus();}
-        else{panel.setAttribute('hidden','');}
-      });
-      function ask(){
-        var q=input.value.trim(); if(!q) return;
-        add(q,'me'); input.value='';
-        var typing=add('…','bot');
-        fetch('/bot/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})})
-          .then(function(r){return r.json();})
-          .then(function(d){typing.textContent=d.answer||'—';})
-          .catch(function(){typing.textContent='Sorry, something went wrong.';});
-      }
-      send.addEventListener('click',ask);
-      input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();ask();}});
-    })();
-  </script>
-  {% endif %}
+  {% include '_bot.html' %}
+  {% include '_install.html' %}
 </body>
 </html>

@@ -82,6 +82,15 @@ CREATE TABLE IF NOT EXISTS requests (
     created_at   TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+-- البلوكات الجاهزة (يديرها المسؤول) — لكل مجموعة مستوى
+CREATE TABLE IF NOT EXISTS blocks (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    level_group TEXT NOT NULL,
+    name        TEXT NOT NULL,
+    courses     TEXT NOT NULL,
+    is_active   INTEGER NOT NULL DEFAULT 1
+);
+
 -- فرق مشروع التخرج (بيانات منظّمة للداشبورد + Excel)
 CREATE TABLE IF NOT EXISTS sp_teams (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,9 +124,19 @@ def init_db(force=False):
     cols = [r[1] for r in conn.execute("PRAGMA table_info(requests)").fetchall()]
     if "grad_semester" not in cols:
         conn.execute("ALTER TABLE requests ADD COLUMN grad_semester TEXT")
+    if "block_id" not in cols:
+        conn.execute("ALTER TABLE requests ADD COLUMN block_id INTEGER")
     conn.commit()
     if conn.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 0:
         seed(conn)
+    # seed blocks from the plan if the table is empty (first run or after adding the table)
+    if conn.execute("SELECT COUNT(*) FROM blocks").fetchone()[0] == 0:
+        from plan_data import BLOCKS
+        for group, blist in BLOCKS.items():
+            for b in blist:
+                conn.execute("INSERT INTO blocks(level_group,name,courses,is_active) VALUES(?,?,?,1)",
+                             (group, b["name"], ", ".join(b["courses"])))
+        conn.commit()
     conn.close()
 
 
